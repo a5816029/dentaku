@@ -4,7 +4,7 @@
     <script language="JavaScript">
     <!--
     disp    = "0";
-    disp2    = "0";
+    disp2   = "0";
 	disp3   = "";
     flag    = 0;
 	result  = 0;
@@ -13,7 +13,7 @@
         if(val >= 0 && val <= 9) {            //　電卓に表示する数列を作成
             if(flag == 0) {
                 disp    = val;
-                disp2    = "0";
+                disp2   = "0";
                 flag    = 1;
             }
             else {
@@ -23,7 +23,8 @@
         }
         else if(val == "Ｃ") {                //　クリア
             disp    = "0";
-            disp2    = "0";
+            disp2   = "0";
+			disp3   = "";
             flag    = 0;
 			result  = 0;
         }
@@ -83,31 +84,39 @@
 <form name="form1" action="" method="">
 <table width="250" height="250" border="1" bordercolor="#000000" cellspacing="0" cellpadding="0">
     <tr>
-        <td colspan="4"><input type="text" name="disp" class="disp" value="0"></td>
+        <td colspan="8"><input type="text" name="disp" class="disp" value="0"></td>
     </tr>
     <tr>
         <td width="25%"><input type="button" value="7" onClick="push(this.value)"></td>
         <td width="25%"><input type="button" value="8" onClick="push(this.value)"></td>
         <td width="25%"><input type="button" value="9" onClick="push(this.value)"></td>
         <td width="25%"><input type="button" value="÷" onClick="push(this.value)"></td>
+		<td width="25%"><input type="button" value="(" onClick="push(this.value)"></td>
+		<td width="25%"><input type="button" value=")" onClick="push(this.value)"></td>
     </tr>
     <tr>
         <td><input type="button" value="4" onClick="push(this.value)"></td>
         <td><input type="button" value="5" onClick="push(this.value)"></td>
         <td><input type="button" value="6" onClick="push(this.value)"></td>
         <td><input type="button" value="×" onClick="push(this.value)"></td>
+		<td><input type="button" value="sin" onClick="push(this.value)"></td>
+		<td><input type="button" value="x^" onClick="push(this.value)"></td>
     </tr>
     <tr>
         <td><input type="button" value="1" onClick="push(this.value)"></td>
         <td><input type="button" value="2" onClick="push(this.value)"></td>
         <td><input type="button" value="3" onClick="push(this.value)"></td>
         <td><input type="button" value="－" onClick="push(this.value)"></td>
+		<td><input type="button" value="cos" onClick="push(this.value)"></td>
+		<td><input type="button" value="√" onClick="push(this.value)"></td>
     </tr>
     <tr>
         <td><input type="button" value="0" onClick="push(this.value)"></td>
         <td><input type="button" value="Ｃ" onClick="push(this.value)"></td>
         <td><input type="button" value="＝" onClick="push(this.value)"></td>
         <td><input type="button" value="＋" onClick="push(this.value)"></td>
+		<td><input type="button" value="tan" onClick="push(this.value)"></td>
+		<td><input type="button" value="log" onClick="push(this.value)"></td>
     </tr>
 </table>
 </form>
