@@ -5,4 +5,4 @@ from django.http import HttpResponse
 
 def appmain(request):
 # write your python code
-	return render(request, 'appname/myapp.html')
+	return render(request, 'appname/test.html')
