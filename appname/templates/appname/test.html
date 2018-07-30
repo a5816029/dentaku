@@ -1,90 +1,156 @@
+<!--
+	電卓の計算で難しいところは演算子によって計算の優先度が異なるところである
+	そのため、例えば(1+2×3)のような計算を行うときには2×3を先に行う必要がある
+	こういった計算を行うために、Expression, Term, Factorといったfunction
+	を用意することで、優先度が高い演算を先に行えるようにした。
+	また、入力された値を先読みすることで選択的に計算が行えるようにした。
+-->
+
 <html>
 <head>
 <title>電卓</title>
     <script language="JavaScript">
     <!--
-    disp    = "0";
-    disp2   = "0";
-	disp3   = "";
-	disptemp = "";
-	flagtemp = 0;
-    flag    = 0;
-	result  = 0;
-    function push(val) {
-		disp3 = disp3 + val;
-        if(val >= 0 && val <= 9) {            //　電卓に表示する数列を作成
-            if(flag == 0) {
-                disp    = val;
-                disp2   = "0";
-                flag    = 1;
-            }
-            else {
-                disp    = disp + val;
-                disp    = parseFloat(disp);
-            }
-        }
-		else if(val == "(") {					// （）の計算
-			disptemp = disp2;
-			disp = "0";
-			disp2 = "0";
-			flagtemp = flag;
-			flag = 0;
+	disp3 = "";
+	var next = "";
+	var tokenList = "+-×÷()sincostanπ√log"
+	
+	<!-- 符号などが正しいものか判断する -->
+	function Token(d){
+		if(tokenList.indexOf(d) > -1)
+			return 1;
+		else
+			return 0;
+	}
+	
+	<!-- 次のトークンを呼び出す -->
+	function getNextToken(){
+		len = disp3.length;
+		r = disp3.slice(0, 1);
+		disp3 = disp3.substring(len, 1);
+		if(r >= 0 || r <= 9){
+			this.num = parseFloat(r);
+			this.token = "";
+		}else if(Token(r)){
+			this.num = 0;
+			this.token = r;
 		}
-		else if(val == ")") {					// （）の計算
-			if(disp) {
-                switch(flag) {            //　計算
-                case 1:disp2 = parseFloat(disp2) + parseFloat(disp); break;
-                case 2:disp2 = parseFloat(disp2) - parseFloat(disp); break;
-                case 3:disp2 = parseFloat(disp2) * parseFloat(disp); break;
-                case 4:disp2 = parseFloat(disp2) / parseFloat(disp); break;
-                }
-            }
-			disp = disptemp;
-			flag = flagtemp;
+	}
+	
+	<!-- Cまたは=が押されるまで文字列として入力値を受け取る -->
+	function push(val){
+		disp = "";
+		if(val == 'C'){
+			next = "";
+			disp3 = "";
+			document.form1.disp.value = disp3;
+		}else if(val != "="){
+			disp3 = disp3 + val;
+			document.form1.disp.value = disp3;
+		}else{
+			disp = display();
+			document.form1.disp.value = disp;
 		}
-        else if(val == "Ｃ") {                //　クリア
-            disp    = "0";
-            disp2   = "0";
-			disp3   = "";
-            flag    = 0;
-			result  = 0;
-        }
-        else {
-            if(disp) {
-                switch(flag) {            //　計算
-                case 1:disp2 = parseFloat(disp2) + parseFloat(disp); break;
-                case 2:disp2 = parseFloat(disp2) - parseFloat(disp); break;
-                case 3:disp2 = parseFloat(disp2) * parseFloat(disp); break;
-                case 4:disp2 = parseFloat(disp2) / parseFloat(disp); break;
-                }
-            }
-            if(val == "＝") {            //　計算方法を記憶
-                flag    = 0;
-                disp    = disp2;
-				document.form1.disp.value = disp        //　結果を表示
-				result = 1;
-            }
-            else if(val == "＋") {
-                flag    = 1;
-                disp    = "";
-            }
-            else if(val == "－") {
-                flag    = 2;
-                disp    = "";
-            }
-            else if(val == "×") {
-                flag    = 3;
-                disp    = "";
-            }
-            else if(val == "÷") {
-                flag    = 4;
-                disp    = "";
-            }
-        }
+	}
+	
+	<!-- ここが計算のmainである。最終的な計算結果が返ってくる -->
+	function display(){
+		disp = "";
+		next = new getNextToken();
+		if(next.token == '('){
+			disp = display();
+		}else{
+			disp = Factor();
+		}
+		if(next.token == ')'){
+			return disp;
+		}
+		disp = Term(disp);
+		disp = Expression(disp);
+		return disp;
+	}
+	
+	<!-- +または-の計算を再帰的に行う(優先度3番目) -->
+	function Expression(r){
+	
+		type = "";
+		while((type = next.token) == '+' || type == '-'){
+			next = new getNextToken();
+			if(type == '+'){
+				r += Term(next.num);
+				if(next.token == ')'){
+					return r;
+				}
+			}else if(type == '-'){
+				r -= Term(next.num);
+				if(next.token == ')'){
+					return r;
+				}
+			}else{
+				document.form1.disp.value = "error";
+			}
+		}
 		
-		if(result == 0)
-			document.form1.disp.value = disp3        //　電卓に表示
-    }
+		return r;
+	}
+	
+	<!-- ×または÷の計算を再帰的に行う(優先度2番目) -->
+	function Term(r){
+		
+		type = "";
+		r = Factor();
+		next = new getNextToken();
+		while((type = next.token) == '×' || type == '÷'){
+			next = new getNextToken();
+			if(type == '×'){
+				r *= Factor();
+				if(next.token == ')'){
+					return r;
+				}
+				next = new getNextToken();
+			}else if(type == '÷'){
+				r /= Factor();
+				if(next.token == ')'){
+					return r;
+				}
+				next = new getNextToken();
+			}else{
+				document.form1.disp.value = "error";
+			}
+		}
+		
+		return r;
+	}
+	
+	<!-- 電卓の右側にある演算子についての計算を行う(優先度1番目) -->
+	function Factor(){
+		if(next.token == '('){
+			return display();
+		}else if(next.token == 's'){
+			next = new getNextToken();
+			next = new getNextToken();
+			return (Math.sin(display())).toFixed(2);
+		}else if(next.token == 'c'){
+			next = new getNextToken();
+			next = new getNextToken();
+			return (Math.cos(display())).toFixed(2);
+		}else if(next.token == 't'){
+			next = new getNextToken();
+			next = new getNextToken();
+			return (Math.tan(display())).toFixed(2);
+		}else if(next.token == 'π'){
+			return 3.14;
+		}else if(next.token == '√'){
+			return (Math.sqrt(display())).toFixed(2);
+		}else if(next.token == 'l'){
+			next = new getNextToken();
+			next = new getNextToken();
+			return (Math.log10(display())).toFixed(2);
+		}
+		
+		return next.num;
+	}
+
     //-->
     </script>
     <style>
@@ -112,32 +178,32 @@
         <td width="25%"><input type="button" value="8" onClick="push(this.value)"></td>
         <td width="25%"><input type="button" value="9" onClick="push(this.value)"></td>
         <td width="25%"><input type="button" value="÷" onClick="push(this.value)"></td>
-		<td width="25%"><input type="button" value="(" onClick="push(this.value)"></td>
-		<td width="25%"><input type="button" value=")" onClick="push(this.value)"></td>
+        <td width="25%"><input type="button" value="(" onClick="push(this.value)"></td>
+        <td width="25%"><input type="button" value=")" onClick="push(this.value)"></td>
     </tr>
     <tr>
         <td><input type="button" value="4" onClick="push(this.value)"></td>
         <td><input type="button" value="5" onClick="push(this.value)"></td>
         <td><input type="button" value="6" onClick="push(this.value)"></td>
         <td><input type="button" value="×" onClick="push(this.value)"></td>
-		<td><input type="button" value="sin" onClick="push(this.value)"></td>
-		<td><input type="button" value="x^" onClick="push(this.value)"></td>
+        <td><input type="button" value="sin" onClick="push(this.value)"></td>
+        <td><input type="button" value="π" onClick="push(this.value)"></td>
     </tr>
     <tr>
         <td><input type="button" value="1" onClick="push(this.value)"></td>
         <td><input type="button" value="2" onClick="push(this.value)"></td>
         <td><input type="button" value="3" onClick="push(this.value)"></td>
-        <td><input type="button" value="－" onClick="push(this.value)"></td>
-		<td><input type="button" value="cos" onClick="push(this.value)"></td>
-		<td><input type="button" value="√" onClick="push(this.value)"></td>
+        <td><input type="button" value="-" onClick="push(this.value)"></td>
+        <td><input type="button" value="cos" onClick="push(this.value)"></td>
+        <td><input type="button" value="√" onClick="push(this.value)"></td>
     </tr>
     <tr>
         <td><input type="button" value="0" onClick="push(this.value)"></td>
-        <td><input type="button" value="Ｃ" onClick="push(this.value)"></td>
-        <td><input type="button" value="＝" onClick="push(this.value)"></td>
-        <td><input type="button" value="＋" onClick="push(this.value)"></td>
-		<td><input type="button" value="tan" onClick="push(this.value)"></td>
-		<td><input type="button" value="log" onClick="push(this.value)"></td>
+        <td><input type="button" value="C" onClick="push(this.value)"></td>
+        <td><input type="button" value="=" onClick="push(this.value)"></td>
+        <td><input type="button" value="+" onClick="push(this.value)"></td>
+        <td><input type="button" value="tan" onClick="push(this.value)"></td>
+        <td><input type="button" value="log" onClick="push(this.value)"></td>
     </tr>
 </table>
 </form>
