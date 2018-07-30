@@ -1,0 +1,198 @@
+<html>
+<head>
+<title>電卓</title>
+    <script language="JavaScript">
+    <!--
+	disp3 = "";
+	var next = "";
+	var tokenList = "+-×÷()sincostanπ√log"
+	
+	function Token(d){
+		if(tokenList.indexOf(d) > -1)
+			return 1;
+		else
+			return 0;
+	}
+	
+	function getNextToken(){
+		len = disp3.length;
+		r = disp3.slice(0, 1);
+		disp3 = disp3.substring(len, 1);
+		if(r >= 0 || r <= 9){
+			this.num = parseFloat(r);
+			this.token = "";
+		}else if(Token(r)){
+			this.num = 0;
+			this.token = r;
+		}
+	}
+	
+	function push(val){
+		disp = "";
+		if(val == 'C'){
+			next = "";
+			disp3 = "";
+			document.form1.disp.value = disp3;
+		}else if(val != "="){
+			disp3 = disp3 + val;
+			document.form1.disp.value = disp3;
+		}else{
+			disp = display();
+			document.form1.disp.value = disp;
+		}
+	}
+	
+	function display(){
+		disp = "";
+		next = new getNextToken();
+		if(next.token == '('){
+			disp = display();
+		}else{
+			disp = Factor();
+		}
+		if(next.token == ')'){
+			return disp;
+		}
+		disp = Term(disp);
+		disp = Expression(disp);
+		return disp;
+	}
+	
+	function Expression(r){
+	
+		type = "";
+		while((type = next.token) == '+' || type == '-'){
+			next = new getNextToken();
+			if(type == '+'){
+				r += Term(next.num);
+				if(next.token == ')'){
+					return r;
+				}
+				next = new getNextToken();
+			}else if(type == '-'){
+				r -= Term(next.num);
+				if(next.token == ')'){
+					return r;
+				}
+				next = new getNextToken();
+			}else{
+				document.form1.disp.value = "error";
+			}
+		}
+		
+		return r;
+	}
+	
+	function Term(r){
+		
+		type = "";
+		r = Factor();
+		next = new getNextToken();
+		while((type = next.token) == '×' || type == '÷'){
+			next = new getNextToken();
+			if(type == '×'){
+				r *= Factor();
+				if(next.token == ')'){
+					return r;
+				}
+				next = new getNextToken();
+			}else if(type == '÷'){
+				r /= Factor();
+				if(next.token == ')'){
+					return r;
+				}
+				next = new getNextToken();
+			}else{
+				document.form1.disp.value = "error";
+			}
+		}
+		
+		return r;
+	}
+	
+	function Factor(){
+		if(next.token == '('){
+			return display();
+		}else if(next.token == 's'){
+			next = new getNextToken();
+			next = new getNextToken();
+			return (Math.sin(display())).toFixed(2);
+		}else if(next.token == 'c'){
+			next = new getNextToken();
+			next = new getNextToken();
+			return (Math.cos(display())).toFixed(2);
+		}else if(next.token == 't'){
+			next = new getNextToken();
+			next = new getNextToken();
+			return (Math.tan(display())).toFixed(2);
+		}else if(next.token == 'π'){
+			return 3.14;
+		}else if(next.token == '√'){
+			return (Math.sqrt(display())).toFixed(2);
+		}else if(next.token == 'l'){
+			next = new getNextToken();
+			next = new getNextToken();
+			return (Math.log10(display())).toFixed(2);
+		}
+		
+		return next.num;
+	}
+
+    //-->
+    </script>
+    <style>
+    <!--
+    input {
+        width:    100%;
+        height: 100%;
+        font-size:    30px;
+    }
+    .disp {
+        text-align:    right;
+        font-size:    35px;
+    }
+    //-->
+    </style>
+</head>
+<body>
+<form name="form1" action="" method="">
+<table width="250" height="250" border="1" bordercolor="#000000" cellspacing="0" cellpadding="0">
+    <tr>
+        <td colspan="8"><input type="text" name="disp" class="disp" value="0"></td>
+    </tr>
+    <tr>
+        <td width="25%"><input type="button" value="7" onClick="push(this.value)"></td>
+        <td width="25%"><input type="button" value="8" onClick="push(this.value)"></td>
+        <td width="25%"><input type="button" value="9" onClick="push(this.value)"></td>
+        <td width="25%"><input type="button" value="÷" onClick="push(this.value)"></td>
+        <td width="25%"><input type="button" value="(" onClick="push(this.value)"></td>
+        <td width="25%"><input type="button" value=")" onClick="push(this.value)"></td>
+    </tr>
+    <tr>
+        <td><input type="button" value="4" onClick="push(this.value)"></td>
+        <td><input type="button" value="5" onClick="push(this.value)"></td>
+        <td><input type="button" value="6" onClick="push(this.value)"></td>
+        <td><input type="button" value="×" onClick="push(this.value)"></td>
+        <td><input type="button" value="sin" onClick="push(this.value)"></td>
+        <td><input type="button" value="π" onClick="push(this.value)"></td>
+    </tr>
+    <tr>
+        <td><input type="button" value="1" onClick="push(this.value)"></td>
+        <td><input type="button" value="2" onClick="push(this.value)"></td>
+        <td><input type="button" value="3" onClick="push(this.value)"></td>
+        <td><input type="button" value="-" onClick="push(this.value)"></td>
+        <td><input type="button" value="cos" onClick="push(this.value)"></td>
+        <td><input type="button" value="√" onClick="push(this.value)"></td>
+    </tr>
+    <tr>
+        <td><input type="button" value="0" onClick="push(this.value)"></td>
+        <td><input type="button" value="C" onClick="push(this.value)"></td>
+        <td><input type="button" value="=" onClick="push(this.value)"></td>
+        <td><input type="button" value="+" onClick="push(this.value)"></td>
+        <td><input type="button" value="tan" onClick="push(this.value)"></td>
+        <td><input type="button" value="log" onClick="push(this.value)"></td>
+    </tr>
+</table>
+</form>
+</body>
+</html>
