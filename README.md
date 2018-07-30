@@ -1,8 +1,8 @@
 /* README.md */
 
-#月曜最終課題提出物の内容
-##作成したもの：　電卓
-##提出ファイル:
+# 月曜最終課題提出物の内容
+## 作成したもの：　電卓
+## 提出ファイル:
 <p>htmlファイル：　dentaku/appname/templates/appname/test.html</p>
 <p>txtファイル:  dentaku/appname/templates/appname/参考資料.txt</p>
 <p>(言語理論とコンパイラで講義中に使用されたコードを参考にしました)</p>
